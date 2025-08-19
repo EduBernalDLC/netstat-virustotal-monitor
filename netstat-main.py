@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """
 This module displays information about network connections on a system using psutil.The output of psutils is enhanced to
  include city,country and ASN information using Maxmind Geo databases.
@@ -12,7 +12,7 @@ import pygeoip
 import logging.handlers
 import logging
 import argparse
-import ConfigParser
+import configparser
 from IPy import IP
 #DNSBL checks
 from dnsbl import DNSBL_check
@@ -53,7 +53,7 @@ def commandline_options(log_instance):
 		if not args.config_file:
 			args.error("Error - Please enter full path of configuration file.")
 
-	except Exception, e:
+	except Exception as e:
 		log_instance.error('Error while parsing command line arguments - %s' % str(e).strip(), exc_info=True)
 	return args
 
@@ -65,7 +65,7 @@ def _confGetSection(conf, section):
 		for i in conf.items(section):
 			options[i[0]] = i[1]
 		return options
-	except ConfigParser.Error:
+	except configparser.Error:
 		return None  # ignore missing values
 
 
@@ -73,7 +73,7 @@ def _confGet(conf, section, option):
 	"""returns the value of the configuration option or None if not set"""
 	try:
 		return conf.get(section, option)
-	except ConfigParser.Error:
+	except configparser.Error:
 		return None  # ignore missing values
 
 
@@ -81,7 +81,7 @@ def config_options(config_file, log_instance):
 	"""Read configuration file"""
 
 	try:
-		conf = ConfigParser.ConfigParser()
+		conf = configparser.ConfigParser()
 		conf.read(config_file)
 		connections_type = _confGet(conf, "settings", "connections_type") or None
 		virustotal_key = _confGet(conf, "settings", "virustotal_key") or None
@@ -108,7 +108,7 @@ def config_options(config_file, log_instance):
 		       proxy_user, proxy_password, proxy_server, proxy_port, email_user,email_password,email_server,email_port, \
 			   blacklist_countries, blacklist_ips
 
-	except Exception, e:
+	except Exception as e:
 		log_instance.error('Error while reading configuration file - %s' % str(e).strip(), exc_info=True)
 
 
@@ -123,7 +123,7 @@ def find_asn(log_instance, asn_db, ip):
 			return asn_name
 		else:
 			return ''
-	except Exception, e:
+	except Exception as e:
 		log_instance.error("Error while getting ASN information for ip-%s :%s" % (ip, str(e).strip()), exc_info=True)
 
 
@@ -138,7 +138,7 @@ def find_country(log_instance, country_db, ip):
 			return country_name
 		else:
 			return ''
-	except Exception, e:
+	except Exception as e:
 		log_instance.error("Error while getting country information for ip-%s :%s" % (ip, str(e).strip()),
 		                   exc_info=True)
 
@@ -160,7 +160,7 @@ def find_city(log_instance, city_db, ip):
 			return city_name, city_latitude, city_longitude
 		else:
 			return '', None, None
-	except Exception, e:
+	except Exception as e:
 		log_instance.error("Error while getting city information for ip-%s :%s" % (ip, str(e).strip()), exc_info=True)
 
 
@@ -183,7 +183,7 @@ def check_ip_using_dnsbl(log_instance, ip):
 			return True
 		else:
 			return False
-	except Exception, e:
+	except Exception as e:
 		log_instance.error("Error while checking IP against DNSBL servers-%s" % str(e).strip())
 
 
@@ -212,7 +212,7 @@ def check_ip_using_virustotal(log_instance, api_key, user, password, server, por
 			return True
 		else:
 			return False
-	except Exception, e:
+	except Exception as e:
 		log_instance.error("Error while checking IP against Virustotal database-%s" % str(e).strip())
 
 
@@ -240,16 +240,16 @@ def mail_to_admin(log_instance, malware_contents, mail_user, mail_passwd, mail_s
 		#msg.attach(part2)
 	try:
 		so = smtplib.SMTP(mail_server)
-		so.docmd("AUTH LOGIN", base64.b64encode(mail_user))
-		so.docmd(base64.b64encode(mail_passwd), "")
+		so.docmd("AUTH LOGIN", base64.b64encode(mail_user.encode()).decode())
+		so.docmd(base64.b64encode(mail_passwd.encode()).decode(), "")
 		#so.login(config.email_user,config.email_passwd)
 		try:
 			so.sendmail(from_mail, to_mail, msg.as_string())
-		except Exception, e:
+		except Exception as e:
 			log_instance.error("Error while sending E-mail about suspicious IP connections - %s" % str(e))
 		finally:
 			so.close()
-	except Exception, e:
+	except Exception as e:
 		log_instance.error("Unable to send E-mail about suspicious IP connections - %s" % str(e))
 
 
@@ -274,9 +274,9 @@ if __name__ == '__main__':
 
 		ip_asn = ip_country = ip_city = None
 
-		print "Network connection details:"
-		print "{0:15} {1:12} {2:15} {3:12} {4:20} {5:20} {6:20}".format("Local addr", "Local port", "Remote addr", \
-				"Remote port", "Country", "Virustotal status", "DNSBL status")
+		print("Network connection details:")
+		print("{0:15} {1:12} {2:15} {3:12} {4:20} {5:20} {6:20}".format("Local addr", "Local port", "Remote addr", \
+				"Remote port", "Country", "Virustotal status", "DNSBL status"))
 
 		blacklisted_country_connections = []
 		blacklisted_ip_connections = []
@@ -316,8 +316,8 @@ if __name__ == '__main__':
 						                                              item.raddr[0])
 						dnsbl_result = check_ip_using_dnsbl(log_instance, item.raddr[0])
 
-						print "{0:15} {1:12} {2:15} {3:12} {4:20} {5:20} {6:20}".format(str(item.laddr[0]),str(item.laddr[1]),str(item.raddr[0]), \
-						    str(item.raddr[1]),ip_country, str(virustotal_result),str(dnsbl_result))
+						print("{0:15} {1:12} {2:15} {3:12} {4:20} {5:20} {6:20}".format(str(item.laddr[0]),str(item.laddr[1]),str(item.raddr[0]), \
+						    str(item.raddr[1]),ip_country, str(virustotal_result),str(dnsbl_result)))
 
 						# tracking blacklisted country connections
 						if blacklist_countries:
@@ -345,6 +345,6 @@ if __name__ == '__main__':
 			mail_to_admin(log_instance, blacklisted_ip_connections, email_user, email_password, email_server, \
 			              email_port)
 
-	except Exception, e:
+	except Exception as e:
 		log_instance.error('The network connections can not be displayed because of error- %s' % str(e).strip(),
                    exc_info=True)

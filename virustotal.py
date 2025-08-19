@@ -4,8 +4,7 @@
 #
 #Limits - The number of requests are limited to at most 4 requests of any nature in any given 1 minute time frame.
 
-import urllib
-import urllib2
+import urllib.request, urllib.parse, urllib.error
 import hashlib
 
 class Virustotal():
@@ -44,7 +43,7 @@ class Virustotal():
 		"""
 
 		if self.debug == 1:
-			print message + '\n'
+			print(message + '\n')
 	
 	def __error(self,message = ''):
 		
@@ -53,7 +52,7 @@ class Virustotal():
 		"""
 
 		if self.debug == 1 and self.error == 1:
-			print message + '\n'
+			print(message + '\n')
 	
 	
 	def setup_proxy(self,name,port,user,passwd):
@@ -62,11 +61,11 @@ class Virustotal():
 			set-up proxy with basic authentication
 		"""
 
-		proxy = urllib2.ProxyHandler({'http':'http://' + user + ':' + passwd + '@' + name + ':' + port,'https':'http://' + user + ':' + passwd + '@' + name + ':' + port})
+		proxy = urllib.request.ProxyHandler({'http':'http://' + user + ':' + passwd + '@' + name + ':' + port,'https':'http://' + user + ':' + passwd + '@' + name + ':' + port})
 		
-		auth = urllib2.HTTPBasicAuthHandler()
+		auth = urllib.request.HTTPBasicAuthHandler()
 
-		opener = urllib2.build_opener(proxy, auth, urllib2.HTTPHandler)
+		opener = urllib.request.build_opener(proxy, auth, urllib.request.HTTPHandler)
 
 		return opener
 	
@@ -98,22 +97,22 @@ class Virustotal():
 		# request using proxy or not
 		if proxy_handler:
 	
-			urllib2.install_opener(proxy_handler)
+			urllib.request.install_opener(proxy_handler)
 
 		# POST request parameters
 		post_parameters = {"url": check_url,"apikey": self.apikey}
 		
-		encoded_data = urllib.urlencode(post_parameters)
+		encoded_data = urllib.parse.urlencode(post_parameters)
 		
-		req = urllib2.Request(self.url_scan, encoded_data)
+		req = urllib.request.Request(self.url_scan, encoded_data)
 		
 		try:
 		
-			response = urllib2.urlopen(req)
+			response = urllib.request.urlopen(req)
 		
-		except Exception,e:
+		except Exception as e:
 			
-			self.__debug("Error while submitting URL - %s to VirusTotal for analysis -%s." %(check_url,e.strip()))
+			self.__debug("Error while submitting URL - %s to VirusTotal for analysis -%s." %(check_url,str(e).strip()))
 
 		scan_result = response.read()
 		
@@ -141,22 +140,22 @@ class Virustotal():
 		# request using proxy or not
 		if proxy_handler:
 	
-			urllib2.install_opener(proxy_handler)
+			urllib.request.install_opener(proxy_handler)
 
 		# POST request parameters
 		post_parameters = {"url": report_url,"apikey": self.apikey}
 		
-		encoded_data = urllib.urlencode(post_parameters)
+		encoded_data = urllib.parse.urlencode(post_parameters)
 		
-		req = urllib2.Request(self.url_report, encoded_data)
+		req = urllib.request.Request(self.url_report, encoded_data)
 		
 		try:
 		
-			response = urllib2.urlopen(req)
+			response = urllib.request.urlopen(req)
 		
-		except Exception,e:
+		except Exception as e:
 			
-			self.__debug("Error while getting VirusTotal report for URL - %s - %s." %(report_url,e.strip()))
+			self.__debug("Error while getting VirusTotal report for URL - %s - %s." %(report_url,str(e).strip()))
 
 		report_result = response.read()
 		
@@ -183,7 +182,7 @@ class Virustotal():
 		
 			from urllib2_post import MultiPartForm
 		
-		except Exception,e:
+		except Exception as e:
 			self.__debug("Error while importing module - MultiPartForm")
 			self.__error("Error while importing module - MultiPartForm")
 
@@ -202,9 +201,9 @@ class Virustotal():
 		# request using proxy or not
 		if proxy_handler:
 	
-			urllib2.install_opener(proxy_handler)
+			urllib.request.install_opener(proxy_handler)
 
-		req = urllib2.Request(self.url_report)
+		req = urllib.request.Request(self.url_report)
 
 		self.__form_body = str(self.__post_form)
 
@@ -214,9 +213,9 @@ class Virustotal():
 
 		req.add_data(self.__form_body)
 		try:
-			response = urllib2.urlopen(req)
-		except Exception,e:
-			self.__debug("Error while submitting file - %s to VirusTotal - %s." %(file_name,e.strip()))
+			response = urllib.request.urlopen(req)
+		except Exception as e:
+			self.__debug("Error while submitting file - %s to VirusTotal - %s." %(file_name,str(e).strip()))
 
 		report_result = response.read()
 		
@@ -244,22 +243,22 @@ class Virustotal():
 		# request using proxy or not
 		if proxy_handler:
 	
-			urllib2.install_opener(proxy_handler)
+			urllib.request.install_opener(proxy_handler)
 
 		# POST request parameters
 		post_parameters = {"resource": md5_hash,"apikey": self.apikey}
 		
-		encoded_data = urllib.urlencode(post_parameters)
+		encoded_data = urllib.parse.urlencode(post_parameters)
 		
-		req = urllib2.Request(self.url_report, encoded_data)
+		req = urllib.request.Request(self.url_report, encoded_data)
 		
 		try:
 		
-			response = urllib2.urlopen(req)
+			response = urllib.request.urlopen(req)
 		
-		except Exception,e:
+		except Exception as e:
 			
-			self.__debug("Error while getting VirusTotal report for file - %s - %s." %(filename,e.strip()))
+			self.__debug("Error while getting VirusTotal report for file - %s - %s." %(filename,str(e).strip()))
 
 		report_result = response.read()
 		
@@ -287,20 +286,20 @@ class Virustotal():
 		# request using proxy or not
 		if proxy_handler:
 	
-			urllib2.install_opener(proxy_handler)
+			urllib.request.install_opener(proxy_handler)
 
 		# GET request parameters
 		get_parameters = {"domain": check_domain,"apikey": self.apikey}
 		
-		encoded_data = urllib.urlencode(get_parameters)
+		encoded_data = urllib.parse.urlencode(get_parameters)
 		
 		try:
 		
-			response = urllib2.urlopen('%s?%s'%(self.domain_report,encoded_data))
+			response = urllib.request.urlopen('%s?%s'%(self.domain_report,encoded_data))
 		
-		except Exception,e:
+		except Exception as e:
 			
-			self.__debug("Error while getting VirusTotal domain report for URL - %s - %s." %(domain_url,e.strip()))
+			self.__debug("Error while getting VirusTotal domain report for URL - %s - %s." %(domain_url,str(e).strip()))
 
 		report_result = response.read()
 		
@@ -328,20 +327,20 @@ class Virustotal():
 		# request using proxy or not
 		if proxy_handler:
 	
-			urllib2.install_opener(proxy_handler)
+			urllib.request.install_opener(proxy_handler)
 
 		# GET request parameters
 		get_parameters = {"ip": check_ip,"apikey": self.apikey}
 		
-		encoded_data = urllib.urlencode(get_parameters)
+		encoded_data = urllib.parse.urlencode(get_parameters)
 		
 		try:
 		
-			response = urllib2.urlopen('%s?%s'%(self.ip_report,encoded_data))
+			response = urllib.request.urlopen('%s?%s'%(self.ip_report,encoded_data))
 		
-		except Exception,e:
+		except Exception as e:
 			
-			self.__debug("Error while getting VirusTotal IP report for URL - %s - %s." %(check_ip,e.strip()))
+			self.__debug("Error while getting VirusTotal IP report for URL - %s - %s." %(check_ip,str(e).strip()))
 
 		report_result = response.read()
 		
