@@ -7,7 +7,7 @@ A big thanks to Giampaolo Rodola for writing psutils(http://pythonhosted.org/psu
 
 Installation
 ==============
-Netstat-virustotal-monitor has been tested on CentOS distribution but should work on any platform without any issues.
+Netstat-virustotal-monitor has been tested on Amazon Linux 2023 and CentOS distributions but should work on any platform without any issues.
 
 Running
 =========
@@ -17,7 +17,7 @@ Running
 	- City - http://geolite.maxmind.com/download/geoip/database/GeoLiteCity.dat.gz
 	- ASN - http://download.maxmind.com/download/geoip/database/asnum/GeoIPASNum.dat.gz
 
-To run the script:
+To run the script with Python 3:
 
-netstat-main.py --config ./netstat-monitor.conf
+python3 netstat-main.py --config ./netstat-monitor.conf
 
